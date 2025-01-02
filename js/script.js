@@ -226,6 +226,12 @@ function checkPowerUpCollision() {
     }
 }
 
+let health = 3; // Player starts with 3 lives
+
+function updateHealth() {
+    ctx.fillText(`Health: ${health}`, 10, 60);
+}
+
 // Check for game over
 function checkGameOver() {
     for (let i = 0; i < enemies.length; i++) {
@@ -234,9 +240,15 @@ function checkGameOver() {
             enemies[i].x < player.x + player.width &&
             enemies[i].x + enemies[i].width > player.x
         ) {
-            gameOver = true;
-            displayGameOver();
-            return;
+            health--;
+            enemies.splice(i, 1); // Remove the enemy that hit the player
+            i--;
+
+            if (health <= 0) {
+                gameOver = true;
+                displayGameOver();
+                return;
+            }
         }
     }
 }
@@ -253,6 +265,47 @@ function displayGameOver() {
     ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2);
     ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 40);
 }
+
+let highScore = localStorage.getItem("highScore") || 0;
+
+function updateHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+    }
+
+    ctx.fillText(`High Score: ${highScore}`, canvas.width - 200, 60);
+}
+
+const shootSound = new Audio("/assets/sounds/bow-and-arrow-shoot-sound-effect-1-239700.mp3");
+const explosionSound = new Audio("assets/sounds/explosion.wav");
+
+function spawnBullet() {
+    shootSound.play();
+    bullets.push({
+        x: player.x + player.width / 2 - bulletWidth / 2,
+        y: player.y,
+        width: bulletWidth,
+        height: bulletHeight,
+        color: "yellow"
+    });
+}
+
+function handleEnemyCollision() {
+    explosionSound.play();
+    // Handle collision logic
+}
+
+
+
+// function displayStartMenu() {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     ctx.font = "40px Arial";
+//     ctx.fillText("Space Shooter", canvas.width / 2 - 100, canvas.height / 2 - 40);
+//     ctx.font = "20px Arial";
+//     ctx.fillText("Press S to Start", canvas.width / 2 - 80, canvas.height / 2 + 20);
+// }
+
 
 // Main game loop
 function gameLoop(timestamp) {
