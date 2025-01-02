@@ -138,6 +138,16 @@ function drawBullets() {
     });
 }
 
+// Score variable
+let score = 0;
+
+// Update score when an enemy is destroyed
+function updateScore() {
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText(`Score: ${score}`, 10, 30);
+}
+
 // Check for collisions between bullets and enemies
 function checkCollisions() {
     for (let i = 0; i < bullets.length; i++) {
@@ -152,6 +162,9 @@ function checkCollisions() {
                 enemies.splice(j, 1);
                 bullets.splice(i, 1);
                 i--; // Adjust bullet index after removal
+
+                // Increase the score
+                score += 10;
                 break;
             }
         }
@@ -169,6 +182,7 @@ function gameLoop() {
     updateBullets(); // Update bullet positions
     drawBullets(); // Draw bullets
     checkCollisions(); // Check for collisions
+    updateScore(); // Display the score
     requestAnimationFrame(gameLoop); // Repeat the loop
 }
 
