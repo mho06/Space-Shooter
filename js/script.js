@@ -141,12 +141,15 @@ function drawBullets() {
 // Score variable
 let score = 0;
 
-// Update score when an enemy is destroyed
+// Update score when game is running
 function updateScore() {
-    ctx.font = "20px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText(`Score: ${score}`, 10, 30);
+    if (!gameOver) {
+        resetCanvasContext(); // Reset the canvas context
+        ctx.fillText(`Score: ${score}`, 10, 30);
+    }
 }
+
+
 
 // Check for collisions between bullets and enemies
 function checkCollisions() {
@@ -176,28 +179,48 @@ let gameOver = false;
 
 // Function to display "Game Over" screen
 function displayGameOver() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas completely
+
     ctx.font = "40px Arial";
     ctx.fillStyle = "red";
     ctx.textAlign = "center";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+
     ctx.font = "20px Arial";
-    ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2 + 40);
-    ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 80);
+    ctx.fillStyle = "white";
+    ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2);
+
+    ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 40);
 }
+
+
+
 
 // Restart the game
 document.addEventListener("keydown", (event) => {
     if (gameOver && event.key.toLowerCase() === "r") {
-        // Reset game state
+        // Reset game variables
         gameOver = false;
         score = 0;
         bullets.length = 0;
         enemies.length = 0;
         player.x = canvas.width / 2 - player.width / 2;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas completely
+        resetCanvasContext(); // Reset the canvas context state
+
         gameLoop(); // Restart the game loop
     }
 });
+
+
+// Reset the canvas context state
+function resetCanvasContext() {
+    ctx.font = "20px Arial"; // Reset font
+    ctx.fillStyle = "white"; // Reset fill color
+    ctx.textAlign = "left"; // Reset alignment
+}
+
 
 // Check for game over (when an enemy reaches the player)
 function checkGameOver() {
@@ -215,11 +238,13 @@ function checkGameOver() {
 }
 
 
-// Update the game loop to include the game over check
+// Main game loop
 function gameLoop() {
     if (gameOver) return; // Stop the loop if the game is over
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas completely
+    resetCanvasContext(); // Reset the canvas context
+
     updatePlayer(); // Update player position
     drawPlayer(); // Draw the player ship
     updateEnemies(); // Update enemy positions
@@ -231,6 +256,7 @@ function gameLoop() {
     updateScore(); // Display the score
     requestAnimationFrame(gameLoop); // Repeat the loop
 }
+
 
 
 
