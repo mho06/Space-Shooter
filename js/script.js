@@ -171,9 +171,54 @@ function checkCollisions() {
     }
 }
 
+// Game over flag
+let gameOver = false;
 
-// Update the game loop to include bullets and collisions
+// Function to display "Game Over" screen
+function displayGameOver() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.font = "40px Arial";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+    ctx.font = "20px Arial";
+    ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2 + 40);
+    ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 80);
+}
+
+// Restart the game
+document.addEventListener("keydown", (event) => {
+    if (gameOver && event.key.toLowerCase() === "r") {
+        // Reset game state
+        gameOver = false;
+        score = 0;
+        bullets.length = 0;
+        enemies.length = 0;
+        player.x = canvas.width / 2 - player.width / 2;
+        gameLoop(); // Restart the game loop
+    }
+});
+
+// Check for game over (when an enemy reaches the player)
+function checkGameOver() {
+    for (let i = 0; i < enemies.length; i++) {
+        if (
+            enemies[i].y + enemies[i].height >= player.y &&
+            enemies[i].x < player.x + player.width &&
+            enemies[i].x + enemies[i].width > player.x
+        ) {
+            gameOver = true;
+            displayGameOver();
+            return;
+        }
+    }
+}
+
+
+// Update the game loop to include the game over check
 function gameLoop() {
+    if (gameOver) return; // Stop the loop if the game is over
+
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
     updatePlayer(); // Update player position
     drawPlayer(); // Draw the player ship
@@ -182,6 +227,7 @@ function gameLoop() {
     updateBullets(); // Update bullet positions
     drawBullets(); // Draw bullets
     checkCollisions(); // Check for collisions
+    checkGameOver(); // Check for game over
     updateScore(); // Display the score
     requestAnimationFrame(gameLoop); // Repeat the loop
 }
