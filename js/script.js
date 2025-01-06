@@ -184,11 +184,9 @@ function makePlayerInvisible() {
 
     isInvisible = true;
     console.log("Player is now invisible!");
-    player.color = "rgba(0, 0, 0, 0.3)"; // Make player semi-transparent (30% visible)
 
     setTimeout(() => {
         isInvisible = false; // Reset invisibility
-        player.color = "blue"; // Restore player's original color
         console.log("Invisibility expired!");
     }, 20000); // Invisibility lasts for 20 seconds
 }
@@ -359,7 +357,6 @@ function drawPowerUps() {
 function checkCollisions() {
     // Handle enemy collisions
     for (let i = 0; i < enemies.length; i++) {
-        // Check if the player collides with the enemy
         if (
             enemies[i].x < player.x + player.width && // Enemy's left side crosses player's right side
             enemies[i].x + enemies[i].width > player.x && // Enemy's right side crosses player's left side
@@ -367,18 +364,15 @@ function checkCollisions() {
             enemies[i].y + enemies[i].height > player.y // Enemy's bottom side crosses player's top side
         ) {
             if (!isInvisible) { 
-                // Only lose health if the player is NOT invisible
-                health--; 
+                health--; // Only lose health if the player is visible
                 console.log(`Player hit by enemy! Health: ${health}`);
             } else {
                 console.log("Enemy collision ignored due to invisibility!");
             }
 
-            // Always remove the enemy after a collision
-            enemies.splice(i, 1);
+            enemies.splice(i, 1); // Always remove the enemy after a collision
             i--; // Adjust index after removal
 
-            // Trigger game over if health reaches 0
             if (health <= 0) {
                 gameOver = true;
                 displayGameOver();
@@ -389,26 +383,22 @@ function checkCollisions() {
 
     // Handle meteor collisions
     for (let i = 0; i < meteors.length; i++) {
-        // Check if the player collides with the meteor
         if (
-            meteors[i].x < player.x + player.width && // Meteor's left side crosses player's right side
-            meteors[i].x + meteors[i].width > player.x && // Meteor's right side crosses player's left side
-            meteors[i].y < player.y + player.height && // Meteor's top side crosses player's bottom side
-            meteors[i].y + meteors[i].height > player.y // Meteor's bottom side crosses player's top side
+            meteors[i].x < player.x + player.width &&
+            meteors[i].x + meteors[i].width > player.x &&
+            meteors[i].y < player.y + player.height &&
+            meteors[i].y + meteors[i].height > player.y
         ) {
             if (!isInvisible) { 
-                // Only lose health if the player is NOT invisible
-                health--;
+                health--; // Only lose health if the player is visible
                 console.log(`Player hit by meteor! Health: ${health}`);
             } else {
                 console.log("Meteor collision ignored due to invisibility!");
             }
 
-            // Always remove the meteor after a collision
-            meteors.splice(i, 1);
+            meteors.splice(i, 1); // Always remove the meteor after a collision
             i--; // Adjust index after removal
 
-            // Trigger game over if health reaches 0
             if (health <= 0) {
                 gameOver = true;
                 displayGameOver();
@@ -421,10 +411,10 @@ function checkCollisions() {
     for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < enemies.length; j++) {
             if (
-                bullets[i].x < enemies[j].x + enemies[j].width && // Bullet's left side crosses enemy's right side
-                bullets[i].x + bullets[i].width > enemies[j].x && // Bullet's right side crosses enemy's left side
-                bullets[i].y < enemies[j].y + enemies[j].height && // Bullet's top side crosses enemy's bottom side
-                bullets[i].y + bullets[i].height > enemies[j].y // Bullet's bottom side crosses enemy's top side
+                bullets[i].x < enemies[j].x + enemies[j].width &&
+                bullets[i].x + bullets[i].width > enemies[j].x &&
+                bullets[i].y < enemies[j].y + enemies[j].height &&
+                bullets[i].y + bullets[i].height > enemies[j].y
             ) {
                 explosionSound.play(); // Play explosion sound
                 bullets.splice(i, 1); // Remove bullet
@@ -440,25 +430,22 @@ function checkCollisions() {
     // Handle power-up collisions
     for (let i = 0; i < powerUps.length; i++) {
         if (
-            powerUps[i].x < player.x + player.width && // Power-up's left side crosses player's right side
-            powerUps[i].x + powerUps[i].width > player.x && // Power-up's right side crosses player's left side
-            powerUps[i].y < player.y + player.height && // Power-up's top side crosses player's bottom side
-            powerUps[i].y + powerUps[i].height > player.y // Power-up's bottom side crosses player's top side
+            powerUps[i].x < player.x + player.width &&
+            powerUps[i].x + powerUps[i].width > player.x &&
+            powerUps[i].y < player.y + player.height &&
+            powerUps[i].y + powerUps[i].height > player.y
         ) {
-            // Apply effect based on the power-up type
             if (powerUps[i].type === "health") {
-                health++; // Add 1 extra health
+                health++;
                 console.log("Health increased! Current health:", health);
             } else if (powerUps[i].type === "score") {
-                score += 50; // Add 50 to the score
+                score += 50;
                 console.log("Score increased! Current score:", score);
             } else if (powerUps[i].type === "invisible") {
-                makePlayerInvisible(); // Trigger invisibility
-                console.log("Player is now invisible!");
+                makePlayerInvisible();
             }
 
-            // Remove the power-up after applying its effect
-            powerUps.splice(i, 1);
+            powerUps.splice(i, 1); // Remove the power-up after applying its effect
             i--; // Adjust index after removal
         }
     }
@@ -528,6 +515,17 @@ function updateDifficulty(timestamp) {
         spawnEnemy();
         lastEnemySpawnTime = timestamp;
     }
+}
+
+/*---------------------------------
+    High Score Update Section
+---------------------------------*/
+function updateHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+    }
+    ctx.fillText(`High Score: ${highScore}`, canvas.width - 200, 60);
 }
 
 /*---------------------------------
